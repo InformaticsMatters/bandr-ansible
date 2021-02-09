@@ -35,12 +35,12 @@ spec:
         - name: PGUSER
           valueFrom:
             secretKeyRef:
-              name: '{{ recovery_secret }}'
+              name: {{ recovery_secret }}
               key: database_admin_user
         - name: PGADMINPASS
           valueFrom:
             secretKeyRef:
-              name: '{{ recovery_secret }}'
+              name: {{ recovery_secret }}
               key: database_admin_user_password
 {% if recovery_s3_bucket %}
         - name: BACKUP_VOLUME_IS_S3

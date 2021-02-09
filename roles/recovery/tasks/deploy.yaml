@@ -9,8 +9,8 @@
     - recovery_namespace|string|length > 0
     - recovery_sa|string != 'SetMe'
     - recovery_sa|string|length > 0
-    - recovery_user_password|string != 'SetMe'
-    - recovery_user_password|string|length > 0
+    - recovery_secret|string != 'SetMe'
+    - recovery_secret|string|length > 0
 
 - name: Assert source volume is set
   assert:
