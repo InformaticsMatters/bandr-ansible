@@ -14,7 +14,7 @@ recovery_from: latest
 
 # Database (admin) credentials
 recovery_host: postgres
-rovevery_user: postgres
+recovery_user: postgres
 recovery_user_password: SetMe
 
 # If the backup source is S3 you need to name the bucket.
