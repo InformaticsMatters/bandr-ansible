@@ -46,6 +46,18 @@ spec:
         - name: AWS_BUCKET_NAME
           value: '{{ recovery_s3_bucket }}'
 {% endif %}
+
+{% if recovery_s3_bucket %}
+        # In order to use 'fuse' and mount S3 buckets
+        # the container needs to run as 'privileged'
+        # and as SYS-ADMIN.
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+{% endif %}
+
         resources:
 {% if recovery_cpu_limit or recovery_mem_limit %}
           limits:
