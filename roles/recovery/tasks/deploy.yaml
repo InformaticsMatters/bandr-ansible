@@ -1,0 +1,108 @@
+---
+
+# Sanity-checks
+
+- name: Assert control variables
+  assert:
+    that:
+    - recovery_namespace|string != 'SetMe'
+    - recovery_namespace|string|length > 0
+    - recovery_sa|string != 'SetMe'
+    - recovery_sa|string|length > 0
+    - recovery_user_password|string != 'SetMe'
+    - recovery_user_password|string|length > 0
+
+- name: Assert source volume is set
+  assert:
+    that:
+    - recovery_volume_pvc_name|string|length > 0
+  when: recovery_s3_bucket|string|length == 0
+
+- name: Assert source volume is not set (S3)
+  assert:
+    that:
+    - recovery_volume_pvc_name|string|length == 0
+  when: recovery_s3_bucket|string|length > 0
+
+# Assert the following exist...
+# - namespace
+# - service account
+# - volume (unless S3 is the source)
+
+- name: Check namespace
+  k8s_info:
+    kind: Namespace
+    name: "{{ recovery_namespace }}"
+  register: n_result
+
+- name: Assert namespace
+  assert:
+    that: n_result.resources|length == 1
+
+- name: Check service account
+  k8s_info:
+    kind: ServiceAccount
+    namespace: "{{ recovery_namespace }}"
+    name: "{{ recovery_sa }}"
+  register: sa_result
+
+- name: Assert service account
+  assert:
+    that: sa_result.resources|length == 1
+
+- name: Check volume (not using S3)
+  block:
+
+  - name: Check volume
+    k8s_info:
+      kind: PersistentVolumeClaim
+      namespace: "{{ recovery_namespace }}"
+      name: "{{ recovery_volume_pvc_name }}"
+    register: vol_result
+
+  - name: Assert volume
+    assert:
+      that: vol_result.resources|length == 1
+
+  when: recovery_volume_pvc_name|string|length > 0
+
+# Recovery --------------------------------------------------------------------
+
+- name: Remove Existing Recovery Job
+  k8s:
+    state: absent
+    definition: "{{ lookup('template', 'job.yaml.j2') }}"
+    wait: yes
+    wait_timeout: "{{ wait_timeout }}"
+
+# Delete the Pods left behind that are Completed ('Succeeded').
+# Kubernetes *DOES NOT* remove these Job-based Pods automatically
+# (see https://kubernetes.io/docs/concepts/workloads/controllers/job/).
+# Instead completed Jobs need to be removed manually by the user.
+# The logic that follows list all Jobs (Pods)
+# that have Succeeded and then deletes them.
+
+- name: Get Succeeded Recovery Pods
+  k8s_info:
+    kind: Pod
+    namespace: "{{ recovery_namespace }}"
+    label_selectors:
+    - name=recovery
+    field_selectors:
+    - status.phase=Succeeded
+  register: pods_result
+
+- name: Delete Succeeded Recovery Pods
+  k8s:
+    kind: Pod
+    namespace: "{{ recovery_namespace }}"
+    name: "{{ item.metadata.name }}"
+    state: absent
+  loop: "{{ pods_result.resources }}"
+  when: pods_result.resources|length > 0
+
+- name: Deploy New Recovery Job
+  k8s:
+    definition: "{{ lookup('template', 'job.yaml.j2') }}"
+    wait: yes
+    wait_timeout: "{{ wait_timeout }}"

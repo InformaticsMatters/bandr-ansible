@@ -1,0 +1,27 @@
+---
+
+# The namespace containing the database that will be used to recover to.
+# The namespace is expected to have a suitable service account.
+#
+# If a docker-hub PullSecret is expected than it is assumed that it
+# already exists in the namespace and is attached to the service account.
+recovery_namespace: SetMe
+recovery_sa: SetMe
+
+# The backup to recover.
+# See the sql-recovery implementation for options.
+recovery_from: latest
+
+# Database (admin) credentials
+recovery_host: postgres
+rovevery_user: postgres
+recovery_user_password: SetMe
+
+# If the backup source is S3 you need to name the bucket.
+# You cannot define a bucket and a claim name.
+recovery_s3_bucket: ''
+recovery_s3_access_key_id: "{{ {{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+recovery_s3_secret_access_key: "{{ {{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+# If the backup source is a volume you need to provide the claim name.
+# You cannot define a claim name and a bucket.
+recovery_volume_pvc_name: ''

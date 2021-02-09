@@ -1,0 +1,75 @@
+---
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: recovery
+  namespace: {{ recovery_namespace }}
+spec:
+  selector:
+    name: recovery
+  template:
+    metadata:
+      labels:
+        name: recovery
+    spec:
+      serviceAccountName: {{ recovery_sa }}
+
+      containers:
+      - name: recovery
+{% if recovery_image_registry %}
+        image: {{ recovery_image_registry }}/{{ recovery_image }}:{{ recovery_image_tag }}
+{% else %}
+        image: {{ recovery_image }}:{{ recovery_image_tag }}
+{% endif %}
+{% if sq_image_tag == 'latest' %}
+        imagePullPolicy: Always
+{% else %}
+        imagePullPolicy: IfNotPresent
+{% endif %}
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        - name: FROM_BACKUP
+          value: '{{ recovery_from }}'
+        - name: PGHOST
+          value: '{{ recovery_host }}'
+        - name: PGUSER
+          value: '{{ recovery_user }}'
+        - name: PGADMINPASS
+          value: '{{ recovery_user_password }}'
+{% if recovery_s3_bucket %}
+        - name: BACKUP_VOLUME_IS_S3
+          value: 'yes'
+        - name: AWS_ACCESS_KEY_ID
+          value: '{{ recovery_s3_access_key_id }}'
+        - name: AWS_SECRET_ACCESS_KEY
+          value: '{{ recovery_s3_secret_access_key }}'
+        - name: AWS_BUCKET_NAME
+          value: '{{ recovery_s3_bucket }}'
+{% endif %}
+        resources:
+{% if recovery_cpu_limit or recovery_mem_limit %}
+          limits:
+{% if recovery_cpu_limit %}
+            cpu: {{ recovery_cpu_limit }}
+{% endif %}
+{% if recovery_mem_limit %}
+            memory: {{ recovery_mem_limit }}
+{% endif %}
+{% endif %}
+          requests:
+            cpu: {{ recovery_cpu_request }}
+            memory: {{ recovery_mem_request }}
+{% if not recovery_s3_bucket %}
+        volumeMounts:
+        - name: backup-data
+          mountPath: /backup
+{% endif %}
+
+{% if not recovery_s3_bucket %}
+      volumes:
+      - name: backup-data
+        persistentVolumeClaim:
+          claimName: backup-claim
+{% endif %}
+
+      restartPolicy: Never

@@ -1,0 +1,12 @@
+---
+
+recovery_image_registry: ''
+recovery_image: informaticsmatters/sql-recovery
+recovery_image_tag: stable
+
+# CPU and Memory requests and limits.
+# Limits can be set to 0 to avoid them being defined in the Pod.
+recovery_cpu_request: 250m
+recovery_cpu_limit: 1
+recovery_mem_request: 100Mi
+recovery_mem_limit: 500Mi
