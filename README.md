@@ -7,9 +7,10 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/informaticsmatters/bandr-ansible/badge)](https://www.codefactor.io/repository/github/informaticsmatters/bandr-ansible)
 
 AWX-compatible Ansible playbooks for the deployment of our backup and recovery
-([bandr]) container images as CronJobs (for Backup) and Jobs (for Recovery).
+([bandr]) container images as **CronJobs** (for Backup) and **Jobs**
+(for Recovery) to an existing **Namespace**.
 
-The playbooks assume a namespace/service account etc. already exist.
+The playbooks assume a **ServiceAccount** exists in the namespace.
 
 ---
 
