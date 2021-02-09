@@ -27,6 +27,7 @@
 # Assert the following exist...
 # - namespace
 # - service account
+# - secret
 # - volume (unless S3 is the source)
 
 - name: Check namespace
@@ -49,6 +50,17 @@
 - name: Assert service account
   assert:
     that: sa_result.resources|length == 1
+
+- name: Check secret
+  k8s_info:
+    kind: Secret
+    namespace: "{{ recovery_namespace }}"
+    name: "{{ recovery_secret }}"
+  register: secret_result
+
+- name: Assert secret
+  assert:
+    that: secret_result.resources|length == 1
 
 - name: Check volume (not using S3)
   block:

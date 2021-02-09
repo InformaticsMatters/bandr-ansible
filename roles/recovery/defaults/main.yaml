@@ -7,15 +7,18 @@
 # already exists in the namespace and is attached to the service account.
 recovery_namespace: SetMe
 recovery_sa: SetMe
+recovery_host: postgres
 
 # The backup to recover.
 # See the sql-recovery implementation for options.
 recovery_from: latest
 
-# Database (admin) credentials
-recovery_host: postgres
-recovery_user: postgres
-recovery_user_password: SetMe
+# Database (admin) credentials are in a secret in the namespace.
+# The admin user and password are expected in the secret's: -
+# - database_admin_user
+# - database_admin_user_password
+# We just need to supply the name of the Secret.
+recovery_secret: postgres
 
 # If the backup source is S3 you need to name the bucket.
 # You cannot define a bucket and a claim name.

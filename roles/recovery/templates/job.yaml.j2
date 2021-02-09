@@ -33,9 +33,15 @@ spec:
         - name: PGHOST
           value: '{{ recovery_host }}'
         - name: PGUSER
-          value: '{{ recovery_user }}'
+          valueFrom:
+            secretKeyRef:
+              name: '{{ recovery_secret }}'
+              key: database_admin_user
         - name: PGADMINPASS
-          value: '{{ recovery_user_password }}'
+          valueFrom:
+            secretKeyRef:
+              name: '{{ recovery_secret }}'
+              key: database_admin_user_password
 {% if recovery_s3_bucket %}
         - name: BACKUP_VOLUME_IS_S3
           value: 'yes'
