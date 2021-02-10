@@ -13,6 +13,9 @@ recovery_host: postgres
 # See the sql-recovery implementation for options.
 recovery_from: latest
 
+# Wait for recovery to finish?
+recovery_wait_until_done: yes
+
 # Database (admin) credentials are in a secret in the namespace.
 # The admin user and password are expected in the secret's: -
 # - database_admin_user
