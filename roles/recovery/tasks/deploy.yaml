@@ -145,22 +145,26 @@
 - name: Wait for recovery
   block:
 
+  - name: Pause
+    pause:
+      minutes: 2
+
   - name: Wait for Recovery Pod
     k8s_info:
       kind: Pob
       namespace: "{{ recovery_namespace }}"
-      label_selectors:
-      - name=recovery
-      field_selectors:
-      - status.phase=Completed
+#      label_selectors:
+#      - name=recovery
+#      field_selectors:
+#      - status.phase=Completed
     register: result
-    until: result.resources|length > 0
-    delay: 60
-    retries: "{{ recovery_wait_minutes|int }}"
+#    until: result.resources|length > 0
+#    delay: 60
+#    retries: "{{ recovery_wait_minutes|int }}"
 
   - name: Display Recovery Pod status
     debug:
-      var: result.resources[0]
+      var: result
 
   - name: Assert migration success
     assert:
