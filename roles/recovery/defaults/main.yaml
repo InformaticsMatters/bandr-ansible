@@ -6,7 +6,7 @@
 # If a docker-hub PullSecret is expected than it is assumed that it
 # already exists in the namespace and is attached to the service account.
 recovery_namespace: SetMe
-recovery_sa: SetMe
+recovery_sa: postgres
 recovery_host: postgres
 
 # The backup to recover.

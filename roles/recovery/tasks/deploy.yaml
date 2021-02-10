@@ -158,11 +158,13 @@
     delay: 60
     retries: "{{ recovery_wait_minutes|int }}"
 
-  # We expect the result to have
-  # a result that has one entry...set_fact:
-  # resources[0].status.containerStatuses[0]
-  # and the container status should have a 'state.terminated.message'.
+  # We expect the result to have a result that has one entry, i.e.
+  # there is a 'resources[0]'. This is expected to contain the
+  # field 'status.containerStatuses[0]' and the container status
+  # should have a 'state.terminated.message'.
+  #
   # The 'message' is the content of the Pod's termination log file.
+  #
   # We expect this to start with 'SUCCESS' or 'FAILURE'
 
   - name: Get temination message status
