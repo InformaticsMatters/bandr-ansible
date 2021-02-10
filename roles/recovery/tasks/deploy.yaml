@@ -143,19 +143,20 @@
 - name: Wait for recovery
   block:
 
-  - name: Wait for Recovery
+  - name: Wait for Recovery Pod
     k8s_info:
-      kind: Job
+      kind: Pob
       namespace: "{{ recovery_namespace }}"
-      name: recovery
+      label_selectors:
+      - name=recovery
+    field_selectors:
+    - status.phase=Succeeded
     register: result
-    until: >-
-      result.resources[0].status.completionTime is defined
-      or result.resources[0].status.failed is defined
+    until: result.resources|length > 0
     delay: 60
     retries: "{{ recovery_wait_minutes|int }}"
 
-  - name: Display Recovery status
+  - name: Display Recovery Pod status
     debug:
       var: result.resources[0]
 
