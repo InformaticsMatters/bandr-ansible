@@ -113,6 +113,25 @@
   loop: "{{ pods_result.resources }}"
   when: pods_result.resources|length > 0
 
+- name: Get Running Recovery Pods
+  k8s_info:
+    kind: Pod
+    namespace: "{{ recovery_namespace }}"
+    label_selectors:
+    - name=recovery
+    field_selectors:
+    - status.phase=Running
+  register: pods_result
+
+- name: Delete Running Recovery Pods
+  k8s:
+    kind: Pod
+    namespace: "{{ recovery_namespace }}"
+    name: "{{ item.metadata.name }}"
+    state: absent
+  loop: "{{ pods_result.resources }}"
+  when: pods_result.resources|length > 0
+
 - name: Deploy New Recovery Job
   k8s:
     definition: "{{ lookup('template', 'job.yaml.j2') }}"
