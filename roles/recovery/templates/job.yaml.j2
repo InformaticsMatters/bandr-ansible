@@ -52,6 +52,9 @@ spec:
         - name: AWS_BUCKET_NAME
           value: '{{ recovery_s3_bucket }}'
 {% endif %}
+{% if bandr_debug %}
+        - name: POST_DEBUG
+{% endif %}
 
 {% if recovery_s3_bucket %}
         # In order to use 'fuse' and mount S3 buckets

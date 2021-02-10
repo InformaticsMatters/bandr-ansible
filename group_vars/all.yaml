@@ -1,0 +1,7 @@
+---
+
+# Debug mode?
+# If set this sets POST_DEBUG in the container,
+# forcing it to go to sleep after the backup or recovery action
+# allowing you to shell into the Pod and debug it.
+bandr_debug: no
