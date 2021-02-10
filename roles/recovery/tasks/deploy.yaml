@@ -155,8 +155,8 @@
       namespace: "{{ recovery_namespace }}"
 #      label_selectors:
 #      - name=recovery
-#      field_selectors:
-#      - status.phase=Completed
+      field_selectors:
+      - status.phase=Succeeded
     register: result
 #    until: result.resources|length > 0
 #    delay: 60
