@@ -160,7 +160,7 @@
 
   - name: Display Recovery Pod status
     debug:
-      var: .resources[0].status
+      var: result.resources[0].status
 
   - name: Get temination message status
     set_fact:
