@@ -145,32 +145,36 @@
 - name: Wait for recovery
   block:
 
-  - name: Pause
-    pause:
-      minutes: 2
-
   - name: Wait for Recovery Pod
     k8s_info:
       kind: Pod
       namespace: "{{ recovery_namespace }}"
-#      label_selectors:
-#      - name=recovery
+      label_selectors:
+      - name=recovery
       field_selectors:
       - status.phase=Succeeded
     register: result
-#    until: result.resources|length > 0
-#    delay: 60
-#    retries: "{{ recovery_wait_minutes|int }}"
+    until: result.resources|length > 0
+    delay: 60
+    retries: "{{ recovery_wait_minutes|int }}"
 
   - name: Display Recovery Pod status
     debug:
-      var: result
+      var: .resources[0].status
+
+  - name: Get temination message status
+    set_fact:
+      t_message: "{{ result.resources[0].status.containerStatuses[0].state.terminated.message }}"
+
+  - name: Display termination message
+    debug:
+      var: t_message
 
   - name: Assert migration success
     assert:
       that:
-      - result.resources[0].status.succeeded is defined
-      - result.resources[0].status.succeeded == 1
+      - result.resources[0].spec.succeeded is defined
+      - t_message == 1
       - result.resources[0].status.failed is not defined
 
   when: recovery_wait_minutes|int > 0
