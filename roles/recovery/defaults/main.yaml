@@ -14,7 +14,8 @@ recovery_host: postgres
 recovery_from: latest
 
 # Wait for recovery to finish?
-recovery_wait_until_done: yes
+# Set to 0 so as not to wait.
+recovery_wait_minutes: 60
 
 # Database (admin) credentials are in a secret in the namespace.
 # The admin user and password are expected in the secret's: -
