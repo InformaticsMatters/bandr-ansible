@@ -132,13 +132,15 @@
   loop: "{{ pods_result.resources }}"
   when: pods_result.resources|length > 0
 
+# Now initiate the recovery...
+
 - name: Deploy New Recovery Job
   k8s:
     definition: "{{ lookup('template', 'job.yaml.j2') }}"
     wait: yes
     wait_timeout: "{{ wait_timeout }}"
 
-# Now wait for the recovery
+# Now (optionally) wait for the recovery...
 
 - name: Wait for recovery
   block:
@@ -150,7 +152,7 @@
       label_selectors:
       - name=recovery
       field_selectors:
-      - status.phase=Succeeded
+      - status.phase=Completed
     register: result
     until: result.resources|length > 0
     delay: 60
