@@ -53,6 +53,8 @@ spec:
           value: '{{ recovery_s3_bucket }}'
 {% endif %}
 {% if bandr_debug %}
+        # POST_DEBUG doesn't need a value - just naming it is enough.
+        #            It will be an empty ENV in the container.
         - name: POST_DEBUG
 {% endif %}
 
