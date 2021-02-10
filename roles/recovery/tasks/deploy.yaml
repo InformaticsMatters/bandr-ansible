@@ -151,7 +151,7 @@
 
   - name: Wait for Recovery Pod
     k8s_info:
-      kind: Pob
+      kind: Pod
       namespace: "{{ recovery_namespace }}"
 #      label_selectors:
 #      - name=recovery
