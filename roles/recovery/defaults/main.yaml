@@ -12,6 +12,13 @@ recovery_host: postgres
 # The backup to recover.
 # See the sql-recovery implementation for options.
 recovery_from: latest
+# The expected number of databases after the recovery is complete.
+# This can be used in automated backup testing as a crude
+# extra-confidence check on the restoration.
+# By setting this value to a positive non-zero value you force
+# the recovery container to count the databases and error if
+# it does not match the value you provided.
+recovery_database_expected_count: 0
 
 # Wait for recovery to finish?
 # Set to 0 so as not to wait.

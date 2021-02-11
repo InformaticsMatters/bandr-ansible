@@ -11,6 +11,7 @@
     - recovery_sa|string|length > 0
     - recovery_secret|string != 'SetMe'
     - recovery_secret|string|length > 0
+    - recovery_database_expected_count|int >= 0
 
 - name: Assert source volume is set
   assert:
