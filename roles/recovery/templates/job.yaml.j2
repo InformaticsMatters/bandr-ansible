@@ -21,7 +21,7 @@ spec:
 {% else %}
         image: {{ recovery_image }}:{{ recovery_image_tag }}
 {% endif %}
-{% if recovery_image_tag == 'latest' %}
+{% if recovery_image_tag in ['latest', 'stable'] %}
         imagePullPolicy: Always
 {% else %}
         imagePullPolicy: IfNotPresent
