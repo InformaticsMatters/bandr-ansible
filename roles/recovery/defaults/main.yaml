@@ -19,6 +19,15 @@ recovery_from: latest
 # the recovery container to count the databases and error if
 # it does not match the value you provided.
 recovery_database_expected_count: 0
+# The maximum age of the latest backup?
+# If you set this (1 or higher) the recovery image checks the latest backup
+# is not older than the value you provide.
+#
+# Allow some wiggle-room here. If you're backing up every 6 hours
+# take account of the time it takes to complete the backup, it might take
+# a few minutes or an hour or two. As a general rule, set this to twice the
+# backup period. If you're backing up every 6 hours, set this value to 12.
+recovery_latest_backup_maximum_age_h: 0
 
 # Wait for recovery to finish?
 # Set to 0 so as not to wait.

@@ -46,6 +46,10 @@ spec:
         - name: DATABASE_EXPECTED_COUNT
           value: '{{ recovery_database_expected_count }}'
 {% endif %}
+{% if recovery_latest_backup_maximum_age_h %}
+        - name: LATEST_BACKUP_MAXIMUM_AGE_H
+          value: '{{ recovery_latest_backup_maximum_age_h|int }}'
+{% endif %}
 {% if recovery_s3_bucket %}
         - name: BACKUP_VOLUME_IS_S3
           value: 'yes'
