@@ -7,6 +7,9 @@
 ignore: |
   .github/
   roles/recovery/templates/job.yaml.j2
+  roles/backup/templates/cronjob-database-backup.yaml.j2
+  roles/backup/templates/job-database-backup.yaml.j2
+  roles/backup/templates/pvc.yaml.j2
 
 rules:
   indentation:

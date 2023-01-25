@@ -1,0 +1,64 @@
+---
+kind: CronJob
+apiVersion: batch/v1beta1
+metadata:
+  name: bandr-hourly-backup
+  namespace: {{ backup_namespace }}
+spec:
+  schedule: '{{ backup_cron_hourly_schedule }}'
+  successfulJobsHistoryLimit: 1
+  startingDeadlineSeconds: 180
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            name: bandr-hourly-backup
+        spec:
+          serviceAccountName: {{ backup_namespace_service_account }}
+
+          # A 'preferred' (not guaranteed)
+          # node selection affinity...
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: {{ backup_node_label }}
+                    operator: Exists
+
+          containers:
+          - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
+            name: bandr-hourly-backup
+            imagePullPolicy: IfNotPresent
+            terminationMessagePolicy: FallbackToLogsOnError
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            env:
+            - name: BACKUP_TYPE
+              value: 'hourly'
+            - name: BACKUP_COUNT
+              value: '{{ backup_cron_hourly_count }}'
+            - name: PGHOST
+              value: '{{ backup_database_host }}'
+            - name: PGUSER
+              value: '{{ backup_database_user }}'
+            - name: PGADMINPASS
+              value: '{{ backup_database_user_password }}'
+            volumeMounts:
+            - name: destination
+              mountPath: /backup
+
+          volumes:
+          - name: destination
+            persistentVolumeClaim:
+              claimName: {{ backup_volume_pvc }}
+  
+          restartPolicy: Never

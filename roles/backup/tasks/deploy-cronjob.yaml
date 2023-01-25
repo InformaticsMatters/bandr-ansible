@@ -1,0 +1,8 @@
+---
+
+# Launch the backup as a CronJob
+
+- name: Create Backup CronJob
+  k8s:
+    definition: "{{ lookup('template', 'cronjob-database-backup.yaml.j2') }}"
+    wait: yes

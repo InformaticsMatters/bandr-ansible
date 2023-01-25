@@ -1,0 +1,98 @@
+---
+
+- include_tasks: prep.yaml
+
+# A kubernetes (or OpenShift) host and an API key must be set.
+# We will either have authenticated against an OpenShift server
+# or the AWX kubernetes credentials will have injected suitable
+# values for the K8S_AUTH_HOST and K8S_AUTH_API_KEY environment variables.
+# Either way the ansible variables 'k8s_auth_host' and
+# 'k8s_auth_api_key' will have been set.
+- name: Assert authentication
+  assert:
+    that:
+    - k8s_auth_host|length > 0
+    - k8s_auth_api_key|length > 0
+  when: backup_kubeconfig|string|length == 0
+
+# Go...
+
+- name: Assert key variables
+  assert:
+    that:
+    - backup_namespace|string|length > 0
+    - backup_namespace|string != 'SetMe'
+    - backup_namespace_service_account|string|length > 0
+    - backup_namespace_service_account|string != 'SetMe'
+    - backup_volume_pvc|string|length > 0
+    - backup_volume_pvc|string != 'SetMe'
+    - backup_database_host|string|length > 0
+    - backup_database_host|string != 'SetMe'
+    - backup_database_user|string|length > 0
+    - backup_database_user|string != 'SetMe'
+    - backup_database_user_password|string|length > 0
+    - backup_database_user_password|string != 'SetMe'
+
+- name: Ensure backup PVC
+  block:
+  
+  # Create a backup PVC
+  
+  - name: Create backup PVC
+    k8s:
+      definition: "{{ lookup('template', 'pvc.yaml.j2') }}"
+      wait: yes
+  
+  when: backup_volume_size_g|int > 0
+  
+- name: User pre-existing backup PVC
+  block:
+
+  # The PVC must exist
+
+  - name: Check backup PVC
+    k8s_info:
+      kind: PersistentVolumeClaim
+      api_version: v1
+      namespace: "{{ backup_namespace }}"
+      name: "{{ backup_volume_pvc }}"
+    register: pvc_result
+
+  - name: Assert backup PVC
+    assert:
+      that: pvc_result.resources|length == 1
+
+  when: backup_volume_size_g|int == 0
+  
+# Go...
+
+# ...using AWX (i.e. a Host and API token/key)
+
+- name: Deploy via Host and API
+  block:
+
+  - include_tasks: deploy-cronjob.yaml
+    when: backup_type == 'cron'
+  - include_tasks: deploy-job.yaml
+    when: backup_type == 'once'
+
+  module_defaults:
+    group/k8s:
+      host: "{{ k8s_auth_host }}"
+      api_key: "{{ k8s_auth_api_key }}"
+  when: backup_kubeconfig|string|length == 0
+
+# ...using a (local) kubernetes config file...
+
+- name: Deploy via Kubernetes config
+  block:
+
+  - include_tasks: deploy-cronjob.yaml
+    when: backup_type == 'cron'
+  - include_tasks: deploy-job.yaml
+    when: backup_type == 'once'
+
+  module_defaults:
+    group/k8s:
+      kubeconfig: "{{ backup_kubeconfig }}"
+  when: backup_kubeconfig|string|length != 0

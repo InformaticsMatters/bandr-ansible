@@ -1,0 +1,15 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ backup_volume_pvc }}
+  namespace: {{ backup_namespace }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+{% if backup_volume_storageclass != ' ' %}
+  storageClassName: {{ backup_volume_storageclass }}
+{% endif %}
+  resources:
+    requests:
+      storage: '{{ backup_volume_size_g }}Gi'

@@ -1,0 +1,5 @@
+---
+
+# Do we need to add kubernetes modules?
+# On some older AWX servers we do.
+backup_control_needs_kubernetes: no

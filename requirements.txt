@@ -1,4 +1,7 @@
-ansible == 2.9.17
-jmespath == 0.10.0
-kubernetes == 10.0.1
-openshift == 0.10.1
+ansible == 2.9.27
+kubernetes == 19.15.0
+openshift == 0.13.1
+
+botocore
+boto3
+jmespath

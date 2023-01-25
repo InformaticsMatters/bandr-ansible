@@ -1,0 +1,29 @@
+---
+
+# The namespace containing the database to be backed up.
+backup_namespace: SetMe
+backup_namespace_service_account: SetMe
+
+backup_database_host: SetMe
+backup_database_user: SetMe
+backup_database_user_password: SetMe
+
+# The backup PVC (expected to exist)
+backup_volume_pvc: SetMe
+# If you provide a backup PVC storage site this playbook will create a PVC.
+# If not, the PVC is expected to exist.
+backup_volume_size_g: 0
+backup_volume_storageclass: ' '
+
+# The backup type.
+# One of 'cron' (regular) or 'once' (one-time)
+backup_type: cron
+
+# Schedule (for cron backup types)
+backup_cron_hourly_schedule: '14 * * * *'
+backup_cron_hourly_count: 24
+
+backup_image_tag: stable
+backup_node_label: informaticsmatters.com/purpose-application
+
+backup_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"

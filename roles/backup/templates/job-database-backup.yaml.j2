@@ -1,0 +1,66 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bandr-backup
+  namespace: {{ backup_namespace }}
+spec:
+  # Clean-up completed (or failed) Jobs
+  # after 5 minutes...
+  ttlSecondsAfterFinished: 300
+
+  template:
+    metadata:
+      labels:
+        name: bandr-backup
+    spec:
+      serviceAccountName: {{ backup_namespace_service_account }}
+
+      # A 'preferred' (not guaranteed)
+      # node selection affinity...
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: {{ backup_node_label }}
+                operator: Exists
+
+      containers:
+      - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
+        name: bandr-backup
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: BACKUP_TYPE
+          value: hourly
+        - name: BACKUP_COUNT
+          value: '2'
+        - name: PGHOST
+          value: database
+        - name: PGUSER
+          value: admin
+        - name: PGADMINPASS
+          valueFrom:
+            secretKeyRef:
+              name: database
+              key: root_password
+        volumeMounts:
+        - name: destination
+          mountPath: /backup
+
+      volumes:
+      - name: destination
+        persistentVolumeClaim:
+          claimName: {{ backup_volume_pvc }}
+
+      restartPolicy: Never
+  backoffLimit: 1
