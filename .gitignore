@@ -1,4 +1,8 @@
 .idea
 venv
 
+**/*.sql
+**/*.sql.gz
+**/sql.out
+
 parameters.yaml
