@@ -1,0 +1,87 @@
+---
+
+- include_tasks: prep.yaml
+
+# A kubernetes (or OpenShift) host and an API key must be set.
+# We will either have authenticated against an OpenShift server
+# or the AWX kubernetes credentials will have injected suitable
+# values for the K8S_AUTH_HOST and K8S_AUTH_API_KEY environment variables.
+# Either way the ansible variables 'k8s_auth_host' and
+# 'k8s_auth_api_key' will have been set.
+- name: Assert authentication
+  assert:
+    that:
+    - k8s_auth_host|length > 0
+    - k8s_auth_api_key|length > 0
+  when: backup_kubeconfig|string|length == 0
+
+# Go...
+
+- name: Assert key variables
+  assert:
+    that:
+    - backup_namespace|string|length > 0
+    - backup_namespace|string != 'SetMe'
+    - backup_namespace_service_account|string|length > 0
+    - backup_namespace_service_account|string != 'SetMe'
+    - backup_volume_pvc|string|length > 0
+    - backup_volume_pvc|string != 'SetMe'
+
+# Namespace must exist...
+
+- name: Check Namespace ({{ backup_namespace }})
+  k8s_info:
+    kind: Namespace
+    api_version: v1
+    name: "{{ backup_namespace }}"
+  register: ns_result
+
+- name: Assert Namespace
+  assert:
+    that: ns_result.resources|length == 1
+
+- name: User pre-existing backup PVC
+  block:
+
+  # The PVC must exist
+
+  - name: Check backup PVC
+    k8s_info:
+      kind: PersistentVolumeClaim
+      api_version: v1
+      namespace: "{{ backup_namespace }}"
+      name: "{{ backup_volume_pvc }}"
+    register: pvc_result
+
+  - name: Assert backup PVC
+    assert:
+      that: pvc_result.resources|length == 1
+
+  when: backup_volume_size_g|int == 0
+
+# Go...
+
+# ...using AWX (i.e. a Host and API token/key)
+
+- name: Deploy via Host and API
+  block:
+
+  - include_tasks: deploy.yaml
+
+  module_defaults:
+    group/k8s:
+      host: "{{ k8s_auth_host }}"
+      api_key: "{{ k8s_auth_api_key }}"
+  when: backup_kubeconfig|string|length == 0
+
+# ...using a (local) kubernetes config file...
+
+- name: Deploy via Kubernetes config
+  block:
+
+  - include_tasks: deploy.yaml
+
+  module_defaults:
+    group/k8s:
+      kubeconfig: "{{ backup_kubeconfig }}"
+  when: backup_kubeconfig|string|length != 0

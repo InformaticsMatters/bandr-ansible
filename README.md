@@ -63,6 +63,29 @@ run the playbook: -
 
     ansible-playbook -e @parameters.yaml site-backup.yaml
 
+## Inspecting backups (in the cluster)
+Using a parameter file from either a CRON-based or one-time backup,
+you can use the `site-inspect.yaml` playbook to launch an Ubuntu Pod
+so that you can inspect the backups or use the Pod to copy backups to your
+Kubernetes control host.
+
+Launch an inspection Pod with: -
+
+    ansible-playbook -e @parameters.yaml site-inspect.yaml
+
+With this done you can sell into the Pod: -
+
+    NAMESPACE=my-namespace
+    kubectl exec -it bandr-inspect bash -n ${NAMESPACE}
+
+Or copy a backup file from it...
+
+    NAMESPACE=my-namespace
+    BACKUP=backup-2023-01-26T12:28:31Z-dumpall.sql.gz
+    kubectl cp ${NAMESPACE}/bandr-inspect:/backup/hourly/${BACKUP} ${PWD}/backup.sql.gz
+    
+When you're done, use kubectl to delete the Pod.
+
 ## Testing
 To test this repository (Normally done via GitHib Actions)
 we essentially employ yaml and ansible lint code. From a suitable

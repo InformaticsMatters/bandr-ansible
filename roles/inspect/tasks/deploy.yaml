@@ -1,0 +1,8 @@
+---
+
+# Launch the backup as a CronJob
+
+- name: Create inspection Pod
+  k8s:
+    definition: "{{ lookup('template', 'pod.yaml.j2') }}"
+    wait: yes

@@ -1,0 +1,35 @@
+---
+# The latest ubuntu image that sleeps for about a week.
+# Backups will be found in /backup, with sub-directories
+# for hourly, daily, weekly and monthly.
+kind: Pod
+apiVersion: v1
+metadata:
+  name: bandr-inspect
+  namespace: {{ backup_namespace }}
+spec:
+  containers:
+  - image: ubuntu:latest
+    name: bandr-inspect
+    imagePullPolicy: Always
+    terminationMessagePolicy: FallbackToLogsOnError
+    command:
+      - sleep
+      - "604800"
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    volumeMounts:
+    - name: destination
+      mountPath: /backup
+
+  volumes:
+  - name: destination
+    persistentVolumeClaim:
+      claimName: {{ backup_volume_pvc }}
+
+  restartPolicy: Never
