@@ -1,4 +1,7 @@
 ---
+
+backup_type: 'cron'
+
 # Some stuff you *must* provide...
 backup_namespace: SetMe
 backup_namespace_service_account: SetMe

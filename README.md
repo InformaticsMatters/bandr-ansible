@@ -17,7 +17,7 @@ a suitable **ServiceAccount** exists in the corresponding  **Namespace**.
     corresponding `backup.py` and `recovery.py` modules relating to how the backup and
     recovery containers work and how they are configured.
 
-## Installing a backup
+## Running a CRON-based backup
 If you have a Postgres database in a Kubernetes **Namespace** you can simplify the
 deployment of a backup strategy using the `site-backup.yaml` playbook.
 
@@ -38,7 +38,7 @@ postgres database every 4 hours, keeping daily backups for a week, weekly backup
 month and monthly backups for 2 years. This will result in a total of 38 backup files
 (6 hourly + 6 daily + 3 weekly + 23 monthly).
 
-Copy `parameters-template.yaml` and create a `parameters.yaml` file
+Copy `parameters-cron-template.yaml` and create a `parameters.yaml` file
 (this new file will be ignored from any git commit).
 
 Assuming your database has a **Service** called `database`, and your admin user is
@@ -55,7 +55,14 @@ With this done, run the playbook: -
     ansible-playbook -e @parameters.yaml site-backup.yaml
 
 This example will install four **CronJob** objects.
- 
+
+## Running a one-time backup
+Follow the instructions for the `Running a CRON-based backup` but instead
+copy the parameters-once-template.yaml. Adjust the variables accordingly and then
+run the playbook: -
+
+    ansible-playbook -e @parameters.yaml site-backup.yaml
+
 ## Testing
 To test this repository (Normally done via GitHib Actions)
 we essentially employ yaml and ansible lint code. From a suitable

@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: bandr-backup
+  name: bandr-one-time-backup
   namespace: {{ backup_namespace }}
 spec:
   # Clean-up completed (or failed) Jobs
@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        name: bandr-backup
+        name: bandr-one-time-backup
     spec:
       serviceAccountName: {{ backup_namespace_service_account }}
 
@@ -29,7 +29,7 @@ spec:
 
       containers:
       - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
-        name: bandr-backup
+        name: bandr-one-time-backup
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         resources:
@@ -45,14 +45,11 @@ spec:
         - name: BACKUP_COUNT
           value: '2'
         - name: PGHOST
-          value: database
+          value: '{{ backup_database_host }}'
         - name: PGUSER
-          value: admin
+          value: '{{ backup_database_user }}'
         - name: PGADMINPASS
-          valueFrom:
-            secretKeyRef:
-              name: database
-              key: root_password
+          value: '{{ backup_database_user_password }}'
         volumeMounts:
         - name: destination
           mountPath: /backup

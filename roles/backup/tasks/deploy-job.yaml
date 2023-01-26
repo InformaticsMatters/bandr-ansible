@@ -2,127 +2,64 @@
 
 # Launch the backup (as a Job)
 
-- name: Run backup Job
-  block:
+- name: Remove existing Backup Job
+  k8s:
+    state: absent
+    definition: "{{ lookup('template', 'job-database-backup.yaml.j2') }}"
+    wait: yes
 
-  - name: Remove existing Backup Job
-    k8s:
-      state: absent
-      definition: "{{ lookup('template', 'job-database-backup.yaml.j2') }}"
-      wait: yes
+# Delete the Pods left behind that are Completed ('Succeeded').
+# Kubernetes *DOES NOT* remove these Job-based Pods automatically
+# (see https://kubernetes.io/docs/concepts/workloads/controllers/job/).
+# Instead completed Jobs need to be removed manually by the user.
+# The logic that follows list all the backup Jobs (Pods)
+# that have Succeeded and then deletes them.
 
-  # Delete the Pods left behind that are Completed ('Succeeded').
-  # Kubernetes *DOES NOT* remove these Job-based Pods automatically
-  # (see https://kubernetes.io/docs/concepts/workloads/controllers/job/).
-  # Instead completed Jobs need to be removed manually by the user.
-  # The logic that follows list all NFS replicator Jobs (Pods)
-  # that have Succeeded and then deletes them.
+- name: Get Succeeded Backup Pods
+  k8s_info:
+    kind: Pod
+    namespace: "{{ backup_namespace }}"
+    label_selectors:
+    - name=bandr-one-time-backup
+    field_selectors:
+    - status.phase=Succeeded
+  register: pods_result
 
-  - name: Get Succeeded Backup Pods
-    k8s_info:
-      kind: Pod
-      namespace: "{{ backup_namespace }}"
-      label_selectors:
-      - name=bandr-backup
-      field_selectors:
-      - status.phase=Succeeded
-    register: pods_result
+- name: Delete Succeeded Backup Pods
+  k8s:
+    kind: Pod
+    namespace: "{{ backup_namespace }}"
+    name: "{{ item.metadata.name }}"
+    state: absent
+  loop: "{{ pods_result.resources }}"
+  when: pods_result.resources|length > 0
 
-  - name: Delete Succeeded Backup Pods
-    k8s:
-      kind: Pod
-      namespace: "{{ backup_namespace }}"
-      name: "{{ item.metadata.name }}"
-      state: absent
-    loop: "{{ pods_result.resources }}"
-    when: pods_result.resources|length > 0
+# All clean - start a new Job
 
-  # All clean - start a new Job
+- name: Create Backup Job
+  k8s:
+    definition: "{{ lookup('template', 'job-database-backup.yaml.j2') }}"
+    wait: yes
 
-  - name: Create Backup Job
-    k8s:
-      definition: "{{ lookup('template', 'job-database-backup.yaml.j2') }}"
-      wait: yes
-
-  - name: Wait for Backup Job ({{ replicator_job_timeout_minutes }} minutes)
-    k8s_info:
-      kind: Job
-      namespace: "{{ backup_namespace }}"
-      name: bandr-backup
-    register: result
-    until: >-
-      result.resources[0].status.completionTime is defined
-      or result.resources[0].status.failed is defined
-    delay: 60
-    retries: "{{ (replicator_job_timeout_minutes|int * 60 / 60)|int }}"
-
-  when: replicator_type|string == 'backup'
-
-# Launch the recovery (as a Job)
-
-- name: Run Recovery Job
-  block:
-
-  - name: Remove existing Recovery Job
-    k8s:
-      state: absent
-      definition: "{{ lookup('template', 'job-database-recovery.yaml.j2') }}"
-      wait: yes
-
-  # Delete the Pods left behind that are Completed ('Succeeded').
-  # Kubernetes *DOES NOT* remove these Job-based Pods automatically
-  # (see https://kubernetes.io/docs/concepts/workloads/controllers/job/).
-  # Instead completed Jobs need to be removed manually by the user.
-  # The logic that follows list all NFS replicator Jobs (Pods)
-  # that have Succeeded and then deletes them.
-
-  - name: Get Succeeded Recovery Pods
-    k8s_info:
-      kind: Pod
-      namespace: "{{ stack_namespace_fact }}"
-      label_selectors:
-      - name=postgres-replicator-recovery
-      field_selectors:
-      - status.phase=Succeeded
-    register: pods_result
-
-  - name: Delete Succeeded Recovery Pods
-    k8s:
-      kind: Pod
-      namespace: "{{ stack_namespace_fact }}"
-      name: "{{ item.metadata.name }}"
-      state: absent
-    loop: "{{ pods_result.resources }}"
-    when: pods_result.resources|length > 0
-
-  # All clean - start a new Job
-
-  - name: Create Recovery Job
-    k8s:
-      definition: "{{ lookup('template', 'job-database-recovery.yaml.j2') }}"
-      wait: yes
-
-  - name: Wait for Recovery Job ({{ replicator_job_timeout_minutes }} minutes)
-    k8s_info:
-      kind: Job
-      namespace: "{{ stack_namespace_fact }}"
-      name: postgres-replicator-recovery
-    register: result
-    until: >-
-      result.resources[0].status.completionTime is defined
-      or result.resources[0].status.failed is defined
-    delay: 60
-    retries: "{{ (replicator_job_timeout_minutes|int * 60 / 60)|int }}"
-
-  when: replicator_type|string == 'recovery'
+- name: Wait for Backup Job ({{ backup_job_timeout_minutes }} minutes)
+  k8s_info:
+    kind: Job
+    namespace: "{{ backup_namespace }}"
+    name: bandr-one-time-backup
+  register: result
+  until: >-
+    result.resources[0].status.completionTime is defined
+    or result.resources[0].status.failed is defined
+  delay: 60
+  retries: "{{ (backup_job_timeout_minutes|int * 60 / 60)|int }}"
 
 # Display Job results
 
-- name: Display replicator Job status
+- name: Display Job status
   debug:
     var: result.resources[0].status
 
-- name: Assert replicator Job success
+- name: Assert Job success
   assert:
     that:
     - result.resources[0].status.succeeded is defined

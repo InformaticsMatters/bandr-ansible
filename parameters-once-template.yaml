@@ -1,0 +1,18 @@
+---
+
+backup_type: 'once'
+
+# Some stuff you *must* provide...
+backup_namespace: SetMe
+backup_namespace_service_account: SetMe
+backup_database_user_password: SetMe
+
+# Some stuff you might not need to provide, but can...
+backup_database_host: database
+backup_database_user: postgres
+
+backup_volume_pvc: database-backup
+# Set a size and storage class if you also want a PVC to be created.
+# Leave it as zero if you already have a volume.
+backup_volume_size_g: 0
+backup_volume_storageclass: ' '
