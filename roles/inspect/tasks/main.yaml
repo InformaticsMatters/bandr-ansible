@@ -22,8 +22,8 @@
     that:
     - backup_namespace|string|length > 0
     - backup_namespace|string != 'SetMe'
-    - backup_namespace_service_account|string|length > 0
-    - backup_namespace_service_account|string != 'SetMe'
+    - backup_namespace_sa|string|length > 0
+    - backup_namespace_sa|string != 'SetMe'
     - backup_volume_pvc|string|length > 0
     - backup_volume_pvc|string != 'SetMe'
 

@@ -2,7 +2,7 @@
 
 # The namespace containing the database to be backed up.
 backup_namespace: SetMe
-backup_namespace_service_account: SetMe
+backup_namespace_sa: SetMe
 backup_volume_pvc: SetMe
 
 backup_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"

@@ -4,7 +4,7 @@ backup_type: 'once'
 
 # Some stuff you *must* provide...
 backup_namespace: SetMe
-backup_namespace_service_account: SetMe
+backup_namespace_sa: SetMe
 backup_database_user_password: SetMe
 
 # Some stuff you might not need to provide, but can...

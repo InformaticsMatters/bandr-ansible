@@ -1,8 +1,9 @@
 ---
 
-# The namespace containing the database to be backed up.
+# The namespace containing the database to be backed up
+# and the Namespace service account.
 backup_namespace: SetMe
-backup_namespace_service_account: SetMe
+backup_namespace_sa: SetMe
 
 backup_database_host: SetMe
 backup_database_user: SetMe

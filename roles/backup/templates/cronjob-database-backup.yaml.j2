@@ -16,7 +16,7 @@ spec:
           labels:
             name: bandr-hourly-backup
         spec:
-          serviceAccountName: {{ backup_namespace_service_account }}
+          serviceAccountName: {{ backup_namespace_sa }}
 
           # A 'preferred' (not guaranteed)
           # node selection affinity...
@@ -32,7 +32,11 @@ spec:
           containers:
           - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
             name: bandr-hourly-backup
+{% if backup_image_tag in ['latest', 'stable'] %}
+            imagePullPolicy: Always
+{% else %}
             imagePullPolicy: IfNotPresent
+{% endif %}
             terminationMessagePolicy: FallbackToLogsOnError
             resources:
               limits:
@@ -83,7 +87,7 @@ spec:
           labels:
             name: bandr-daily-backup
         spec:
-          serviceAccountName: {{ backup_namespace_service_account }}
+          serviceAccountName: {{ backup_namespace_sa }}
 
           # A 'preferred' (not guaranteed)
           # node selection affinity...
@@ -99,7 +103,11 @@ spec:
           containers:
           - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
             name: bandr-daily-backup
+{% if backup_image_tag in ['latest', 'stable'] %}
+            imagePullPolicy: Always
+{% else %}
             imagePullPolicy: IfNotPresent
+{% endif %}
             terminationMessagePolicy: FallbackToLogsOnError
             resources:
               limits:
@@ -149,7 +157,7 @@ spec:
           labels:
             name: bandr-weekly-backup
         spec:
-          serviceAccountName: {{ backup_namespace_service_account }}
+          serviceAccountName: {{ backup_namespace_sa }}
 
           # A 'preferred' (not guaranteed)
           # node selection affinity...
@@ -165,7 +173,11 @@ spec:
           containers:
           - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
             name: bandr-weekly-backup
+{% if backup_image_tag in ['latest', 'stable'] %}
+            imagePullPolicy: Always
+{% else %}
             imagePullPolicy: IfNotPresent
+{% endif %}
             terminationMessagePolicy: FallbackToLogsOnError
             resources:
               limits:
@@ -215,7 +227,7 @@ spec:
           labels:
             name: bandr-monthly-backup
         spec:
-          serviceAccountName: {{ backup_namespace_service_account }}
+          serviceAccountName: {{ backup_namespace_sa }}
 
           # A 'preferred' (not guaranteed)
           # node selection affinity...
@@ -231,7 +243,11 @@ spec:
           containers:
           - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
             name: bandr-monthly-backup
+{% if backup_image_tag in ['latest', 'stable'] %}
+            imagePullPolicy: Always
+{% else %}
             imagePullPolicy: IfNotPresent
+{% endif %}
             terminationMessagePolicy: FallbackToLogsOnError
             resources:
               limits:
