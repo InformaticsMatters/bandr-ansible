@@ -62,3 +62,201 @@ spec:
               claimName: {{ backup_volume_pvc }}
   
           restartPolicy: Never
+{% if backup_cron_daily_schedule %}
+---
+# Introduce a daily backup,
+# because a scheule has been defined.
+kind: CronJob
+apiVersion: batch/v1beta1
+metadata:
+  name: bandr-daily-backup
+  namespace: {{ backup_namespace }}
+spec:
+  schedule: '{{ backup_cron_daily_schedule }}'
+  successfulJobsHistoryLimit: 1
+  startingDeadlineSeconds: 180
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            name: bandr-daily-backup
+        spec:
+          serviceAccountName: {{ backup_namespace_service_account }}
+
+          # A 'preferred' (not guaranteed)
+          # node selection affinity...
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: {{ backup_node_label }}
+                    operator: Exists
+
+          containers:
+          - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
+            name: bandr-daily-backup
+            imagePullPolicy: IfNotPresent
+            terminationMessagePolicy: FallbackToLogsOnError
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            env:
+            - name: BACKUP_TYPE
+              value: 'daily'
+            - name: BACKUP_COUNT
+              value: '{{ backup_cron_daily_count }}'
+            - name: BACKUP_PRIOR_TYPE
+              value: 'hourly'
+            - name: BACKUP_PRIOR_COUNT
+              value: '{{ backup_cron_hourly_count }}'
+            volumeMounts:
+            - name: destination
+              mountPath: /backup
+
+          volumes:
+          - name: destination
+            persistentVolumeClaim:
+              claimName: {{ backup_volume_pvc }}
+  
+          restartPolicy: Never
+{% endif %}
+{% if backup_cron_weekly_schedule %}
+---
+# Introduce a weekly backup,
+# because a scheule has been defined.
+kind: CronJob
+apiVersion: batch/v1beta1
+metadata:
+  name: bandr-weekly-backup
+  namespace: {{ backup_namespace }}
+spec:
+  schedule: '{{ backup_cron_weekly_schedule }}'
+  successfulJobsHistoryLimit: 1
+  startingDeadlineSeconds: 180
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            name: bandr-weekly-backup
+        spec:
+          serviceAccountName: {{ backup_namespace_service_account }}
+
+          # A 'preferred' (not guaranteed)
+          # node selection affinity...
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: {{ backup_node_label }}
+                    operator: Exists
+
+          containers:
+          - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
+            name: bandr-weekly-backup
+            imagePullPolicy: IfNotPresent
+            terminationMessagePolicy: FallbackToLogsOnError
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            env:
+            - name: BACKUP_TYPE
+              value: 'weekly'
+            - name: BACKUP_COUNT
+              value: '{{ backup_cron_weekly_count }}'
+            - name: BACKUP_PRIOR_TYPE
+              value: 'daily'
+            - name: BACKUP_PRIOR_COUNT
+              value: '{{ backup_cron_daily_count }}'
+            volumeMounts:
+            - name: destination
+              mountPath: /backup
+
+          volumes:
+          - name: destination
+            persistentVolumeClaim:
+              claimName: {{ backup_volume_pvc }}
+  
+          restartPolicy: Never
+{% endif %}
+{% if backup_cron_monthly_schedule %}
+---
+# Introduce a monthly backup,
+# because a scheule has been defined.
+kind: CronJob
+apiVersion: batch/v1beta1
+metadata:
+  name: bandr-monthly-backup
+  namespace: {{ backup_namespace }}
+spec:
+  schedule: '{{ backup_cron_monthly_schedule }}'
+  successfulJobsHistoryLimit: 1
+  startingDeadlineSeconds: 180
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            name: bandr-monthly-backup
+        spec:
+          serviceAccountName: {{ backup_namespace_service_account }}
+
+          # A 'preferred' (not guaranteed)
+          # node selection affinity...
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: {{ backup_node_label }}
+                    operator: Exists
+
+          containers:
+          - image: informaticsmatters/sql-backup:{{ backup_image_tag }}
+            name: bandr-monthly-backup
+            imagePullPolicy: IfNotPresent
+            terminationMessagePolicy: FallbackToLogsOnError
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            env:
+            - name: BACKUP_TYPE
+              value: 'monthly'
+            - name: BACKUP_COUNT
+              value: '{{ backup_cron_monthly_count }}'
+            - name: BACKUP_PRIOR_TYPE
+              value: 'weekly'
+            - name: BACKUP_PRIOR_COUNT
+              value: '{{ backup_cron_weekly_count }}'
+            volumeMounts:
+            - name: destination
+              mountPath: /backup
+
+          volumes:
+          - name: destination
+            persistentVolumeClaim:
+              claimName: {{ backup_volume_pvc }}
+  
+          restartPolicy: Never
+{% endif %}

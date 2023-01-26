@@ -22,6 +22,12 @@ backup_type: cron
 # Schedule (for cron backup types)
 backup_cron_hourly_schedule: '14 * * * *'
 backup_cron_hourly_count: 24
+backup_cron_daily_schedule: ''
+backup_cron_daily_count: 0
+backup_cron_weekly_schedule: ''
+backup_cron_weekly_count: 0
+backup_cron_monthly_schedule: ''
+backup_cron_monthly_count: 0
 
 backup_image_tag: stable
 backup_node_label: informaticsmatters.com/purpose-application
