@@ -29,6 +29,10 @@ recovery_database_expected_count: 0
 # backup period. If you're backing up every 6 hours, set this value to 12.
 recovery_latest_backup_maximum_age_h: 0
 
+# Do not stop on error?
+# If set the recovery Pod's DO_NOT_STOP_ON_ERROR variable is set.
+recovery_do_not_stop_on_error: no
+
 # Wait for recovery to finish?
 # Set to 0 so as not to wait.
 recovery_wait_minutes: 60

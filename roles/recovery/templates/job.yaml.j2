@@ -42,6 +42,10 @@ spec:
             secretKeyRef:
               name: {{ recovery_secret }}
               key: database_admin_user_password
+{% if recovery_do_not_stop_on_error %}
+        - name: DO_NOT_STOP_ON_ERROR
+          value: '1'
+{% endif %}
 {% if recovery_database_expected_count %}
         - name: DATABASE_EXPECTED_COUNT
           value: '{{ recovery_database_expected_count }}'
