@@ -7,9 +7,9 @@ recovery_image_tag: stable
 # CPU and Memory requests and limits.
 # Limits can be set to 0 to avoid them being defined in the Pod.
 recovery_cpu_request: 250m
-recovery_cpu_limit: 1
+recovery_cpu_limit:
 recovery_mem_request: 100Mi
-recovery_mem_limit: 500Mi
+recovery_mem_limit:
 
 # General timeout,
 # typically used within the k8s module for wait durations.

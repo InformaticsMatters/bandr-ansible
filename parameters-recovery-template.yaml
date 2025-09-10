@@ -1,0 +1,17 @@
+---
+
+backup_type: 'once'
+
+# Some stuff you *must* provide...
+recovery_namespace: SetMe
+recovery_sa: SetMe
+recovery_database_user_password: SetMe
+
+# Some stuff you might not need to provide, but can...
+recovery_database_host: database
+recovery_database_user: postgres
+
+# Set a size and storage class if you also want a PVC to be created.
+# Leave it as zero if you already have a volume.
+recovery_volume_size_g: 0
+recovery_volume_storageclass: ' '

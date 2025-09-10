@@ -1,0 +1,15 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ recovery_volume_pvc }}
+  namespace: {{ recovery_namespace }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+{% if recovery_volume_storageclass != ' ' %}
+  storageClassName: {{ recovery_volume_storageclass }}
+{% endif %}
+  resources:
+    requests:
+      storage: '{{ recovery_volume_size_g }}Gi'

@@ -38,11 +38,11 @@ postgres database every 4 hours, keeping daily backups for a week, weekly backup
 month and monthly backups for 2 years. This will result in a total of 38 backup files
 (6 hourly + 6 daily + 3 weekly + 23 monthly).
 
-Copy `parameters-cron-template.yaml` and create a `parameters.yaml` file
+Copy `parameters-cron-backup-template.yaml` and create a `parameters.yaml` file
 (this new file will be ignored from any git commit).
 
 Assuming your database has a **Service** called `database`, and your admin user is
-`postgres`, then the template variables are already setup to provide you with 2 
+`postgres`, then the template variables are already setup to provide you with 2
 year's worth of backups as described; you just need to provide: -
 
 - The **Namespace**
@@ -83,16 +83,22 @@ Or copy a backup file from it...
     NAMESPACE=my-namespace
     BACKUP=backup-2023-01-26T12:28:31Z-dumpall.sql.gz
     kubectl cp ${NAMESPACE}/bandr-inspect:/backup/hourly/${BACKUP} ${PWD}/backup.sql.gz
-    
+
 When you're done, use kubectl to delete the Pod.
+
+## Recovery (of a database)
+
+    export K8S_AUTH_HOST=https://????
+    export K8S_AUTH_API_KEY=????
+    export K8S_AUTH_VERIFY_SSL=false
 
 ## Testing
 To test this repository (Normally done via GitHib Actions)
 we essentially employ yaml and ansible lint code. From a suitable
 environment...
 
-    python -m venv ~/.venv/bandr-ansible
-    source ~/.venv/bandr-ansible/bin/activate
+    python -m venv venv
+    source venv/bin/activate
     pip install --upgrade pip
     pip install -r requirements.txt
     pip install -r build-requirements.txt

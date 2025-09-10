@@ -60,7 +60,7 @@
 
   when: backup_volume_size_g|int > 0
 
-- name: User pre-existing backup PVC
+- name: Use pre-existing backup PVC
   block:
 
   # The PVC must exist

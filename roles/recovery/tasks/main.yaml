@@ -13,6 +13,38 @@
     that:
     - k8s_auth_host|length > 0
     - k8s_auth_api_key|length > 0
+  when: k8s_auth_kubeconfig|length == 0
+
+- name: Ensure recovery PVC
+  block:
+
+  # Create a recovery PVC
+
+  - name: Create recovery PVC
+    k8s:
+      definition: "{{ lookup('template', 'pvc.yaml.j2') }}"
+      wait: yes
+
+  when: recovery_volume_size_g|int > 0
+
+- name: Use pre-existing recovery PVC
+  block:
+
+  # The PVC must exist
+
+  - name: Check recovery PVC
+    k8s_info:
+      kind: PersistentVolumeClaim
+      api_version: v1
+      namespace: "{{ recovery_namespace }}"
+      name: "{{ recovery_volume_pvc }}"
+    register: pvc_result
+
+  - name: Assert recovery PVC
+    assert:
+      that: pvc_result.resources|length == 1
+
+  when: recovery_volume_size_g|int == 0
 
 # Go...
 

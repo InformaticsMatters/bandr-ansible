@@ -11,7 +11,7 @@ backup_database_user_password: SetMe
 
 # The backup PVC (expected to exist)
 backup_volume_pvc: SetMe
-# If you provide a backup PVC storage site this playbook will create a PVC.
+# If you provide a backup PVC storage size this playbook will create a PVC.
 # If not, the PVC is expected to exist.
 backup_volume_size_g: 0
 backup_volume_storageclass: ' '

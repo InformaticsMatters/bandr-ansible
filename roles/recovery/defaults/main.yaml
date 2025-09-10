@@ -12,6 +12,9 @@ recovery_host: postgres
 # The backup to recover.
 # See the sql-recovery implementation for options.
 recovery_from: latest
+# Recovering from a backup of a specific database?
+# if so, name the database here.
+recovery_database: ''
 # The expected number of databases after the recovery is complete.
 # This can be used in automated backup testing as a crude
 # extra-confidence check on the restoration.
@@ -44,11 +47,27 @@ recovery_wait_minutes: 60
 # We just need to supply the name of the Secret.
 recovery_secret: postgres
 
+# Is the recovery volume expected to be an S3 mount?
+recovery_volume_is_s3: no
+
 # If the backup source is S3 you need to name the bucket.
 # You cannot define a bucket and a claim name.
 recovery_s3_bucket: ''
 recovery_s3_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
 recovery_s3_secret_access_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+recovery_s3_default_region: ''
 # If the backup source is a volume you need to provide the claim name.
 # You cannot define a claim name and a bucket.
 recovery_volume_pvc_name: ''
+
+# Use rclone?
+recovery_use_rclone_bucket_and_path: ''
+recovery_rclone_s3_endpoint: ''
+recovery_rclone_s3_provider: ''
+
+# The recovery PVC (expected to exist)
+recovery_volume_pvc: SetMe
+# If you provide a recovery PVC storage size this playbook will create a PVC.
+# If not, the PVC is expected to exist.
+recovery_volume_size_g: 0
+recovery_volume_storageclass: ' '

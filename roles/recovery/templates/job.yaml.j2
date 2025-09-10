@@ -46,6 +46,10 @@ spec:
         - name: DO_NOT_STOP_ON_ERROR
           value: '1'
 {% endif %}
+{% if recovery_database %}
+        - name: DATABASE
+          value: '{{ recovery_database }}'
+{% endif %}
 {% if recovery_database_expected_count %}
         - name: DATABASE_EXPECTED_COUNT
           value: '{{ recovery_database_expected_count }}'
@@ -54,15 +58,31 @@ spec:
         - name: LATEST_BACKUP_MAXIMUM_AGE_H
           value: '{{ recovery_latest_backup_maximum_age_h|int }}'
 {% endif %}
-{% if recovery_s3_bucket %}
+{% if recovery_volume_is_s3 %}
         - name: BACKUP_VOLUME_IS_S3
           value: 'yes'
+{% endif %}
+{% if recovery_s3_bucket %}
+        - name: AWS_BUCKET_NAME
+          value: '{{ recovery_s3_bucket }}'
+{% endif %}
+{% if recovery_s3_access_key_id %}
         - name: AWS_ACCESS_KEY_ID
           value: '{{ recovery_s3_access_key_id }}'
         - name: AWS_SECRET_ACCESS_KEY
           value: '{{ recovery_s3_secret_access_key }}'
-        - name: AWS_BUCKET_NAME
-          value: '{{ recovery_s3_bucket }}'
+        - name: AWS_DEFAULT_REGION
+          value: '{{ recovery_s3_default_region }}'
+{% endif %}
+{% if recovery_use_rclone_bucket_and_path %}
+        - name: USE_RCLONE
+          value: 'yes'
+        - name: USE_RCLONE_BUCKET_AND_PATH
+          value: {{ recovery_use_rclone_bucket_and_path }}
+        - name: RCLONE_S3_ENDPOINT
+          value: {{ recovery_rclone_s3_endpoint }}
+        - name: RCLONE_S3_PROVIDER
+          value: {{ recovery_rclone_s3_provider }}
 {% endif %}
 {% if bandr_debug %}
         # POST_DEBUG doesn't need a value - just naming it is enough.
@@ -70,7 +90,7 @@ spec:
         - name: POST_DEBUG
 {% endif %}
 
-{% if recovery_s3_bucket %}
+{% if recovery_volume_is_s3 %}
         # In order to use 'fuse' and mount S3 buckets
         # the container needs to run as 'privileged'
         # and as SYS-ADMIN.
@@ -94,17 +114,17 @@ spec:
           requests:
             cpu: {{ recovery_cpu_request }}
             memory: {{ recovery_mem_request }}
-{% if not recovery_s3_bucket %}
+{% if not recovery_volume_is_s3 %}
         volumeMounts:
-        - name: backup-data
-          mountPath: /backup
+        - name: recovery-data
+          mountPath: /recovery
 {% endif %}
 
-{% if not recovery_s3_bucket %}
+{% if not recovery_volume_is_s3 %}
       volumes:
-      - name: backup-data
+      - name: recovery-data
         persistentVolumeClaim:
-          claimName: backup-claim
+          claimName: {{ recovery_volume_pvc }}
 {% endif %}
 
       restartPolicy: Never
