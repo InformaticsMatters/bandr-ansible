@@ -33,15 +33,12 @@ spec:
         - name: PGHOST
           value: '{{ recovery_host }}'
         - name: PGUSER
-          valueFrom:
-            secretKeyRef:
-              name: {{ recovery_secret }}
-              key: database_admin_user
+          value: '{{ recovery_database_admin_user }}'
         - name: PGADMINPASS
           valueFrom:
             secretKeyRef:
-              name: {{ recovery_secret }}
-              key: database_admin_user_password
+              name: {{ recovery_database_secret }}
+              key: {{ recovery_database_secret_admin_user_password_key }}
 {% if recovery_do_not_stop_on_error %}
         - name: DO_NOT_STOP_ON_ERROR
           value: '1'

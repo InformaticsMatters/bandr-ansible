@@ -41,11 +41,8 @@ recovery_do_not_stop_on_error: no
 recovery_wait_minutes: 60
 
 # Database (admin) credentials are in a secret in the namespace.
-# The admin user and password are expected in the secret's: -
-# - database_admin_user
-# - database_admin_user_password
 # We just need to supply the name of the Secret.
-recovery_secret: postgres
+recovery_database_secret: database
 
 # Is the recovery volume expected to be an S3 mount?
 recovery_volume_is_s3: no

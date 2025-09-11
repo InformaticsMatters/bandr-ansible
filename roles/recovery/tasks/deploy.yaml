@@ -9,8 +9,8 @@
     - recovery_namespace|string|length > 0
     - recovery_sa|string != 'SetMe'
     - recovery_sa|string|length > 0
-    - recovery_secret|string != 'SetMe'
-    - recovery_secret|string|length > 0
+    - recovery_database_secret|string != 'SetMe'
+    - recovery_database_secret|string|length > 0
     - recovery_database_expected_count|int >= 0
     - recovery_latest_backup_maximum_age_h|int >= 0
 
@@ -57,7 +57,7 @@
   k8s_info:
     kind: Secret
     namespace: "{{ recovery_namespace }}"
-    name: "{{ recovery_secret }}"
+    name: "{{ recovery_database_secret }}"
   register: secret_result
 
 - name: Assert secret

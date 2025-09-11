@@ -87,10 +87,20 @@ Or copy a backup file from it...
 When you're done, use kubectl to delete the Pod.
 
 ## Recovery (of a database)
+You can run the `site-recovery.yaml` playbook to recover data. What you need to do
+depends on your specific situation but typically you'll need to set suitable
+kubernetes and AWS/S3 variables: -
 
     export K8S_AUTH_HOST=https://????
     export K8S_AUTH_API_KEY=????
     export K8S_AUTH_VERIFY_SSL=false
+
+    export AWS_ACCESS_KEY_ID=????
+    export AWS_SECRET_ACCESS_KEY=????
+
+And then run the playbook with your chosen parameters: -
+
+    ansible-playbook -e @parameters.yaml site-recovery.yaml
 
 ## Testing
 To test this repository (Normally done via GitHib Actions)
