@@ -6,3 +6,4 @@ venv
 **/sql.out
 
 parameters.yaml
+dummy-cluster-parameters.yaml
