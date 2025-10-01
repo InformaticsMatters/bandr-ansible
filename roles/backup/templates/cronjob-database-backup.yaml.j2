@@ -1,6 +1,6 @@
 ---
 kind: CronJob
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 metadata:
   name: bandr-hourly-backup
   namespace: {{ backup_namespace }}
@@ -64,14 +64,12 @@ spec:
           - name: destination
             persistentVolumeClaim:
               claimName: {{ backup_volume_pvc }}
-  
+
           restartPolicy: Never
 {% if backup_cron_daily_schedule %}
 ---
-# Introduce a daily backup,
-# because a scheule has been defined.
 kind: CronJob
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 metadata:
   name: bandr-daily-backup
   namespace: {{ backup_namespace }}
@@ -133,15 +131,13 @@ spec:
           - name: destination
             persistentVolumeClaim:
               claimName: {{ backup_volume_pvc }}
-  
+
           restartPolicy: Never
 {% endif %}
 {% if backup_cron_weekly_schedule %}
 ---
-# Introduce a weekly backup,
-# because a scheule has been defined.
 kind: CronJob
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 metadata:
   name: bandr-weekly-backup
   namespace: {{ backup_namespace }}
@@ -203,15 +199,13 @@ spec:
           - name: destination
             persistentVolumeClaim:
               claimName: {{ backup_volume_pvc }}
-  
+
           restartPolicy: Never
 {% endif %}
 {% if backup_cron_monthly_schedule %}
 ---
-# Introduce a monthly backup,
-# because a scheule has been defined.
 kind: CronJob
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 metadata:
   name: bandr-monthly-backup
   namespace: {{ backup_namespace }}
@@ -273,6 +267,6 @@ spec:
           - name: destination
             persistentVolumeClaim:
               claimName: {{ backup_volume_pvc }}
-  
+
           restartPolicy: Never
 {% endif %}
