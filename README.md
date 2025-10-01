@@ -117,6 +117,7 @@ Run the following: -
 
     yamllint .
     find . -type f -name '*.yaml.j2' -exec yamllint {} +
+    ansible-lint
 
 ---
 

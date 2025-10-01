@@ -11,6 +11,7 @@ ignore: |
   roles/backup/templates/cronjob-database-backup.yaml.j2
   roles/backup/templates/job-database-backup.yaml.j2
   roles/backup/templates/pvc.yaml.j2
+  roles/backup/recovery/pvc.yaml.j2
 
 rules:
   indentation:
